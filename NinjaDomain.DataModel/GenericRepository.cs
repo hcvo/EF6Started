@@ -23,7 +23,7 @@ namespace NinjaDomain.DataModel
         }
         public IEnumerable<T> All()
         {
-            return _dbSet.ToList();
+            return _dbSet.AsNoTracking().ToList();
         }
 
         public void Delete(int id)
