@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace NinjaDomain.Classes
 {
-    public class Class1
+    public enum EquipmentType
     {
+        Tool = 1,
+        Weapon = 2,
+        Outwear = 3
     }
 }
