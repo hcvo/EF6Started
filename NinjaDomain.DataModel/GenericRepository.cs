@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 
 namespace NinjaDomain.DataModel
 {
+    /// <note>
+    /// Limitation or repo pattern is losing the richness of the dbcontext
+    /// </note>
+    /// <typeparam name="T">Name of an entity, a concrete class</typeparam>
     public class GenericRepository<T> : IRepository<T> where T :class
     {
         private DbContext _context;
