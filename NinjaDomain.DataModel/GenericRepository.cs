@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SharedKernel.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -26,15 +28,34 @@ namespace NinjaDomain.DataModel
             return _dbSet.AsNoTracking().ToList();
         }
 
-        public void Delete(int id)
+        public IEnumerable<T> AllInclude(params Expression<Func<T, object>>[] includeProperties)
         {
-            var entity = Find(id);
-            _dbSet.Remove(entity);
+            return GetAllIncluding(includeProperties).ToList();
         }
 
-        public T Find(int id)
+        public T FindByKey(int id)
         {
-            throw new NotImplementedException();
+            var lamda = Utilities.BuildLamdaForFindByKey<T>(id);
+
+            return _dbSet.AsNoTracking().SingleOrDefault(lamda);
+        }
+
+        public IEnumerable<T> FindBy(Expression<Func<T, bool>> predicate)
+        {
+            return _dbSet.AsNoTracking().Where(predicate).ToList();
+        }
+
+        public IEnumerable<T> FindByInclude(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includeProperties)
+        {
+            var query = GetAllIncluding(includeProperties);
+
+            return query.Where(predicate).ToList();
+        }
+
+        public void Delete(int id)
+        {
+            var entity = FindByKey(id);
+            _dbSet.Remove(entity);
         }
 
         public void Insert(T entity)
@@ -45,6 +66,13 @@ namespace NinjaDomain.DataModel
         public void Update(T entity)
         {
             _dbSet.Update(entity);
+        }
+
+        private IQueryable<T> GetAllIncluding(params Expression<Func<T, object>>[] includeProperties)
+        {
+            IQueryable<T> queryable = _dbSet.AsNoTracking();
+
+            return includeProperties.Aggregate(queryable, (current, includeProperty) => current.Include(includeProperty)); 
         }
     }
 }
